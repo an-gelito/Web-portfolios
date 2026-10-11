@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Forge Lane Strength</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800;900&display=swap" rel="stylesheet">
+<style>
+/* Layout: full-bleed orange poster hero with giant condensed type and a barbell that loads plates; white sections below with tabs and a schedule picker. Single look by choice. */
+:root{
+  --orange:#FF5A1F; --ink:#17120F; --paper:#FFFFFF; --peach:#FFE0D0; --grey:#5B514B; --line:#E6D8CF; --orange-deep:#C73E08;
+  --display:'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --body:'Barlow', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.125rem/1.55 var(--body);padding-bottom:4.5rem}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:.95;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{width:min(1120px,100%);margin-inline:auto;padding-inline:max(1rem,4vw)}
+
+.sample{background:var(--ink);color:#F2D9CB;font-size:.875rem;padding-block:.55rem}
+.sample .wrap{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;justify-content:space-between}
+
+.hero{background:var(--orange);color:var(--ink);overflow:hidden}
+.top{display:flex;justify-content:space-between;align-items:center;padding-block:1.25rem;gap:1rem}
+.logo{font-family:var(--display);font-weight:900;font-size:1.7rem;letter-spacing:.01em;text-decoration:none}
+.top a.small{font-weight:600;text-decoration:underline;text-underline-offset:.25em}
+.hero .wrap.body{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:2rem;align-items:end;padding-block:clamp(1.5rem,5vw,3rem) clamp(2.5rem,6vw,4.5rem)}
+h1{font-weight:900;text-transform:uppercase;font-size:clamp(3.4rem,11.5vw,9rem);letter-spacing:-.01em}
+h1 span{display:block;overflow:hidden;padding-bottom:.06em}
+h1 span b{display:block;font-weight:inherit;animation:lift .8s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i) * 120ms + 100ms)}
+@keyframes lift{from{transform:translateY(105%)}to{transform:none}}
+.sub{margin-top:1.6rem;max-width:33rem;font-size:1.25rem;font-weight:500}
+.actions{margin-top:1.8rem;display:flex;flex-wrap:wrap;gap:.75rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:3.25rem;padding:.7rem 1.6rem;font:inherit;font-weight:700;font-size:1.05rem;text-decoration:none;border:2px solid var(--ink);cursor:pointer;transition:transform .15s,background .15s,color .15s}
+.btn:hover{transform:translate(-2px,-2px);box-shadow:4px 4px 0 var(--ink)}
+.btn-dark{background:var(--ink);color:var(--paper)}
+.btn-ghost{background:transparent;color:var(--ink)}
+
+.bar{position:relative;width:100%;aspect-ratio:5/4;max-width:26rem;margin-inline:auto}
+.bar svg{width:100%;height:100%;display:block}
+.plate{transform-box:fill-box;transform-origin:center;animation:slide .7s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--p) * 180ms + 700ms)}
+@keyframes slide{from{transform:translateX(120%);opacity:0}to{transform:none;opacity:1}}
+.cap{margin-top:.6rem;text-align:center;font-weight:600;font-size:.95rem}
+
+.section{padding-block:clamp(3rem,7vw,5.5rem)}
+.section h2{font-size:clamp(2.6rem,6vw,4.5rem);text-transform:uppercase;font-weight:900;max-width:14ch}
+.lead{margin-top:1rem;max-width:36rem;color:var(--grey)}
+
+.lifts{list-style:none;margin:2.5rem 0 0;padding:0;border-top:3px solid var(--ink)}
+.lifts li{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.4fr);gap:1rem 2rem;align-items:baseline;padding:1.1rem 0;border-bottom:1px solid var(--line)}
+.lifts b{font-family:var(--display);font-size:clamp(2rem,4.6vw,3.2rem);font-weight:800;text-transform:uppercase;line-height:1}
+.lifts span{color:var(--grey)}
+
+.plan{background:var(--peach)}
+.tabs{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:2rem}
+.tab{font:inherit;font-weight:700;border:2px solid var(--ink);background:transparent;color:var(--ink);padding:.6rem 1.1rem;min-height:2.9rem;cursor:pointer}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+.panel{margin-top:1.5rem;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:2rem;align-items:start;background:var(--paper);border:2px solid var(--ink);padding:clamp(1.2rem,3vw,2rem)}
+.panel h3{font-size:clamp(2rem,4vw,3rem);text-transform:uppercase;font-weight:900}
+.panel p{margin-top:.8rem;color:var(--grey)}
+.panel ul{margin:0;padding:0;list-style:none;display:grid;gap:.6rem}
+.panel li{display:flex;gap:.7rem;align-items:flex-start;font-weight:500}
+.panel li::before{content:"";flex:none;width:.7rem;height:.7rem;margin-top:.55rem;background:var(--orange)}
+.load{margin-top:1.4rem}
+.load div{display:grid;grid-template-columns:5.5rem minmax(0,1fr);gap:.75rem;align-items:center;font-size:.95rem;font-weight:600;margin-top:.4rem}
+.load i{display:block;height:.8rem;background:var(--orange);transition:width .5s cubic-bezier(.2,.8,.2,1)}
+
+.pick{margin-top:3rem}
+.pick h3{font-size:clamp(1.8rem,3.6vw,2.6rem);text-transform:uppercase;font-weight:900}
+.seg{display:inline-flex;flex-wrap:wrap;margin-top:1rem;border:2px solid var(--ink)}
+.seg button{font:inherit;font-weight:700;border:0;background:var(--paper);color:var(--ink);padding:.7rem 1.2rem;min-height:2.9rem;cursor:pointer}
+.seg button+button{border-left:2px solid var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.sched{margin-top:1.2rem;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;list-style:none;padding:0}
+.sched li{background:var(--paper);border:2px solid var(--ink);padding:1rem 1.1rem}
+.sched b{display:block;font-family:var(--display);font-size:1.9rem;font-weight:800;text-transform:uppercase;line-height:1}
+.sched span{display:block;margin-top:.3rem;color:var(--grey);font-variant-numeric:tabular-nums}
+
+.fit{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:2.5rem;margin-top:2.5rem}
+.fit h3{font-size:2rem;text-transform:uppercase;font-weight:800;padding-bottom:.6rem;border-bottom:3px solid var(--ink)}
+.fit ul{margin:1rem 0 0;padding:0;list-style:none;display:grid;gap:.75rem}
+.fit li{padding-left:1.4rem;position:relative}
+.fit li::before{content:"";position:absolute;left:0;top:.62rem;width:.7rem;height:.7rem;background:var(--orange)}
+.fit .no li::before{background:transparent;border:2px solid var(--ink);width:.7rem;height:.7rem}
+
+.join{background:var(--ink);color:var(--paper)}
+.join .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(2rem,6vw,5rem)}
+.join h2{color:var(--orange)}
+.join .lead{color:#E7D9CF}
+form{display:grid;gap:1rem}
+.field{display:grid;gap:.35rem}
+.field label{font-weight:600}
+input,select{font:inherit;color:var(--ink);background:var(--paper);border:2px solid var(--paper);padding:.75rem .9rem;min-height:3.1rem;width:100%;min-width:0;border-radius:0}
+input:focus-visible,select:focus-visible{outline:3px solid var(--orange);outline-offset:2px}
+.join .btn{background:var(--orange);border-color:var(--orange);color:var(--ink)}
+.join .btn:hover{box-shadow:4px 4px 0 var(--paper)}
+.note{min-height:1.5em;font-weight:600}
+.note.err{color:#FFB199}
+.thanks{border:2px solid var(--orange);padding:1.4rem}
+.thanks h3{color:var(--orange);font-size:2.2rem;text-transform:uppercase;font-weight:900}
+.thanks p{margin-top:.6rem;color:#E7D9CF}
+
+footer{padding-block:1.4rem 2rem;font-size:.9rem;color:var(--grey)}
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--orange);border-top:2px solid var(--ink);padding:.6rem max(1rem,4vw);padding-bottom:calc(.6rem + env(safe-area-inset-bottom,0px));display:flex;align-items:center;justify-content:space-between;gap:1rem}
+.sticky span{font-weight:700}
+.sticky .btn{min-height:2.75rem;padding:.4rem 1.2rem}
+
+@media (max-width:860px){
+  .hero .wrap.body,.join .wrap,.panel,.fit{grid-template-columns:1fr}
+  .bar{max-width:18rem;margin-top:.5rem}
+  .lifts li{grid-template-columns:1fr}
+  .sched{grid-template-columns:1fr}
+}
+@media (max-width:480px){.sticky span{font-size:.95rem}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.001ms!important;animation-delay:0ms!important;transition-duration:.001ms!important}}
+
+/* animated squat scene */
+.rep-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,4rem);align-items:center}
+.rep-fig{margin:0;background:var(--peach);border:3px solid var(--ink);padding:1rem}
+.rep-fig svg{display:block;width:100%;height:auto}
+.rep-bar{display:flex;justify-content:space-between;align-items:center;gap:1rem;margin-top:.5rem;font-family:var(--display);font-size:1.6rem;text-transform:uppercase;letter-spacing:.02em}
+.rep-bar .cue{background:var(--ink);color:var(--paper);padding:.15rem .8rem;min-width:6.5rem;text-align:center}
+.rep-fig figcaption{margin-top:.6rem;font-size:.95rem;color:var(--grey)}
+.cues{list-style:none;margin:1.4rem 0 0;padding:0;display:grid;gap:.6rem;font-weight:600}
+.cues li{border-left:6px solid var(--orange);padding-left:.8rem}
+@media (max-width:820px){.rep-grid{grid-template-columns:minmax(0,1fr)}}
+
+html{-webkit-text-size-adjust:100%}img,svg{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="sample"><div class="wrap"><span>Sample project by Angelo Zagada. Forge Lane Strength is a made-up gym.</span><span>Forms on this page do not send anything.</span></div></div>
+
+<section class="hero">
+  <div class="wrap top"><a class="logo" href="#top">Forge Lane</a><a class="small" href="#plan">See the six weeks</a></div>
+  <div class="wrap body" id="top">
+    <div>
+      <h1 aria-label="Six weeks to your first real squat">
+        <span aria-hidden="true"><b style="--i:0">Six weeks</b></span>
+        <span aria-hidden="true"><b style="--i:1">to your first</b></span>
+        <span aria-hidden="true"><b style="--i:2">real squat</b></span>
+      </h1>
+      <p class="sub">Foundations is a beginner strength program for adults who have never trained with a barbell. Three 50-minute sessions a week, coached in small groups.</p>
+      <div class="actions">
+        <a class="btn btn-dark" href="#join">Join the waitlist</a>
+        <a class="btn btn-ghost" href="#plan">See the six weeks</a>
+      </div>
+    </div>
+    <div>
+      <div class="bar" aria-hidden="true">
+        <svg viewBox="0 0 400 320" role="img" aria-label="">
+          <rect x="10" y="150" width="380" height="14" rx="3" fill="#17120F"/>
+          <rect x="40" y="144" width="26" height="26" fill="#17120F"/>
+          <g class="plate" style="--p:0"><rect x="86" y="70" width="34" height="174" rx="6" fill="#17120F"/><rect x="92" y="78" width="22" height="158" rx="4" fill="none" stroke="#FF5A1F" stroke-width="2"/></g>
+          <g class="plate" style="--p:1"><rect x="126" y="92" width="28" height="130" rx="5" fill="#17120F"/><rect x="131" y="99" width="18" height="116" rx="3" fill="none" stroke="#FF5A1F" stroke-width="2"/></g>
+          <g class="plate" style="--p:2"><rect x="160" y="112" width="22" height="90" rx="4" fill="#17120F"/></g>
+          <g class="plate" style="--p:3"><rect x="188" y="128" width="16" height="58" rx="3" fill="#17120F"/></g>
+          <rect x="210" y="146" width="14" height="22" fill="#FFFFFF" stroke="#17120F" stroke-width="3"/>
+          <text x="200" y="290" text-anchor="middle" font-family="Big Shoulders Display, Impact, sans-serif" font-size="44" font-weight="900" fill="#17120F">20 kg bar</text>
+        </svg>
+      </div>
+      <p class="cap">Week by week, the plates go on.</p>
+    </div>
+  </div>
+</section>
+
+<main>
+<section class="section"><div class="wrap">
+  <h2>Four lifts. That is the whole plan</h2>
+  <p class="lead">Beginners get strong fastest by doing a few movements well and often. You will learn these four.</p>
+  <ul class="lifts">
+    <li><b>Squat</b><span>Sit between your hips, keep your chest up, stand up with the floor.</span></li>
+    <li><b>Deadlift</b><span>Pick a bar up from the floor with a flat back and tight lats.</span></li>
+    <li><b>Press</b><span>Push the bar overhead while your legs and core stay locked in.</span></li>
+    <li><b>Row</b><span>Pull the bar to your belly and keep your ribs down.</span></li>
+  </ul>
+</div></section>
+
+<section class="section plan" id="plan"><div class="wrap">
+  <h2>What the six weeks look like</h2>
+  <div class="tabs" role="tablist" aria-label="Program phases">
+    <button class="tab" role="tab" id="t0" aria-selected="true" aria-controls="panel" data-i="0">Weeks 1 and 2</button>
+    <button class="tab" role="tab" id="t1" aria-selected="false" aria-controls="panel" data-i="1">Weeks 3 and 4</button>
+    <button class="tab" role="tab" id="t2" aria-selected="false" aria-controls="panel" data-i="2">Weeks 5 and 6</button>
+  </div>
+  <div class="panel" id="panel" role="tabpanel" aria-labelledby="t0">
+    <div><h3 id="pTitle"></h3><p id="pText"></p>
+      <div class="load" aria-label="Relative load each week"><div><span id="l1"></span><i id="b1"></i></div><div><span id="l2"></span><i id="b2"></i></div></div>
+    </div>
+    <ul id="pList"></ul>
+  </div>
+
+  <div class="pick">
+    <h3>Pick your three days</h3>
+    <div class="seg" role="group" aria-label="Training days">
+      <button type="button" aria-pressed="true" data-set="a">Monday, Wednesday, Friday</button>
+      <button type="button" aria-pressed="false" data-set="b">Tuesday, Thursday, Saturday</button>
+    </div>
+    <ul class="sched" id="sched"></ul>
+  </div>
+</div></section>
+
+
+<section class="section"><div class="wrap rep-grid">
+  <div>
+    <h2>Learn one rep at a time</h2>
+    <p class="lead">Week one starts with the empty bar. A coach counts the tempo out loud until the movement is boring, then we add weight.</p>
+    <ul class="cues"><li>The bar stays over the middle of your foot</li><li>Down for two seconds, up for one</li><li>Chest up, heels flat on the floor</li></ul>
+  </div>
+  <figure class="rep-fig">
+    <svg viewBox="0 0 360 300" role="img" aria-label="Animation of a person doing five barbell squats, with a dashed line showing the bar staying over the middle of the foot.">
+      <line x1="20" y1="268" x2="340" y2="268" stroke="#17120F" stroke-width="5" stroke-linecap="round"/>
+      <line x1="172" y1="30" x2="172" y2="268" stroke="#C73E08" stroke-width="3" stroke-dasharray="6 8"/>
+      <path id="sq-leg" fill="none" stroke="#17120F" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
+      <path id="sq-torso" fill="none" stroke="#17120F" stroke-width="15" stroke-linecap="round"/>
+      <path d="M160 268h46" stroke="#17120F" stroke-width="10" stroke-linecap="round"/>
+      <circle id="sq-head" r="14" fill="#17120F"/>
+      <g id="sq-bar"><circle r="30" fill="#FF5A1F" stroke="#17120F" stroke-width="6"/><circle r="12" fill="#17120F"/></g>
+    </svg>
+    <div class="rep-bar"><span id="sq-rep">Rep 1 of 5</span><span class="cue" id="sq-cue">Down</span></div>
+    <figcaption>Illustration only. Your coach adjusts the movement to your body.</figcaption>
+  </figure>
+</div></section>
+
+<section class="section"><div class="wrap">
+  <h2>Is this for you</h2>
+  <div class="fit">
+    <div class="yes"><h3>A good fit</h3><ul>
+      <li>You have never trained with a barbell, or you are coming back after a long break.</li>
+      <li>You want someone to show you the movements and check them.</li>
+      <li>You can commit to three sessions a week for six weeks.</li></ul></div>
+    <div class="no"><h3>Not the right program yet</h3><ul>
+      <li>You are preparing for a lifting competition.</li>
+      <li>You have an injury and have not been cleared to train by your doctor.</li>
+      <li>You want a different workout every day.</li></ul></div>
+  </div>
+</div></section>
+
+<section class="section join" id="join"><div class="wrap">
+  <div>
+    <h2>Join the next cohort</h2>
+    <p class="lead">Groups are small so every rep gets a coach's eyes. Join the waitlist and we will email you when registration opens.</p>
+  </div>
+  <div>
+    <form id="joinForm" novalidate>
+      <div class="field"><label for="jn">Your name</label><input id="jn" autocomplete="name"></div>
+      <div class="field"><label for="je">Email</label><input id="je" type="email" autocomplete="email"></div>
+      <div class="field"><label for="jx">Have you used a barbell before?</label>
+        <select id="jx"><option value="">Choose one</option><option>Never</option><option>A few times</option><option>Yes, but not recently</option></select></div>
+      <p class="note" id="jnote" role="status" aria-live="polite"></p>
+      <button class="btn" type="submit">Join the waitlist</button>
+    </form>
+    <div class="thanks" id="thanks" hidden>
+      <h3 id="thanksTitle">You are on the list</h3>
+      <p>This is a sample page, so nothing was sent. On a live site this would add you to the coach's waitlist and send a confirmation email.</p>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap">Sample project by Angelo Zagada. Forge Lane Strength, its program, and its schedule are made up for this demo.</div></footer>
+
+<div class="sticky"><span>Foundations, next cohort</span><a class="btn btn-dark" href="#join">Join the waitlist</a></div>
+
+<script>
+(function(){
+  var phases=[
+    {t:'Learn the movements',p:'Light weight, slow reps, lots of feedback. The goal is a pattern you can repeat, not a number on the bar.',l:['Week 1','Week 2'],w:[28,38],list:['Warm-up routine you can do on your own','Squat, press, and row with a light bar','Deadlift from blocks so the setup is easy','Coach feedback on every set']},
+    {t:'Add load',p:'Once the movements look good, the weight goes up a little each session. Small jumps, steady progress.',l:['Week 3','Week 4'],w:[55,68],list:['Add weight to every lift each session','Deadlift from the floor','Rest times that actually let you recover','A short check-in on how it feels']},
+    {t:'Test your strongest set',p:'The last two weeks build to a hard set of five on each lift. You will know exactly what you can do.',l:['Week 5','Week 6'],w:[82,100],list:['Work up to one heavy set of five','Videos of your lifts to compare with week 1','A written plan for what to do next','Your choice of next program, no pressure']}
+  ];
+  var tabs=[].slice.call(document.querySelectorAll('.tab'));
+  function show(i){
+    var x=phases[i];
+    tabs.forEach(function(t,k){t.setAttribute('aria-selected',k===i?'true':'false');});
+    document.getElementById('panel').setAttribute('aria-labelledby','t'+i);
+    document.getElementById('pTitle').textContent=x.t;
+    document.getElementById('pText').textContent=x.p;
+    document.getElementById('l1').textContent=x.l[0];document.getElementById('l2').textContent=x.l[1];
+    document.getElementById('b1').style.width=x.w[0]+'%';document.getElementById('b2').style.width=x.w[1]+'%';
+    document.getElementById('pList').innerHTML=x.list.map(function(s){return '<li>'+s+'</li>';}).join('');
+  }
+  tabs.forEach(function(t,i){t.addEventListener('click',function(){show(i);});});
+  show(0);
+
+  var sets={a:[['Monday','6:00 am or 6:30 pm'],['Wednesday','6:00 am or 6:30 pm'],['Friday','12:15 pm or 6:30 pm']],b:[['Tuesday','6:00 am or 6:30 pm'],['Thursday','6:00 am or 6:30 pm'],['Saturday','8:00 am or 9:15 am']]};
+  var segs=[].slice.call(document.querySelectorAll('.seg button'));
+  function sched(k){
+    segs.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.set===k?'true':'false');});
+    document.getElementById('sched').innerHTML=sets[k].map(function(r){return '<li><b>'+r[0]+'</b><span>'+r[1]+'</span></li>';}).join('');
+  }
+  segs.forEach(function(b){b.addEventListener('click',function(){sched(b.dataset.set);});});
+  sched('a');
+
+  var form=document.getElementById('joinForm'),thanks=document.getElementById('thanks'),note=document.getElementById('jnote');
+  form.addEventListener('submit',function(e){
+    e.preventDefault();
+    var n=document.getElementById('jn').value.trim(),m=document.getElementById('je').value.trim(),x=document.getElementById('jx').value;
+    note.className='note';
+    if(!n||!/^\S+@\S+\.\S+$/.test(m)||!x){note.className='note err';note.textContent='Add your name, a valid email, and your barbell experience.';return;}
+    document.getElementById('thanksTitle').textContent='You are on the list, '+n.split(' ')[0];
+    form.hidden=true;thanks.hidden=false;
+  });
+})();
+;(function(){
+  var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function onView(el,fn){if(!('IntersectionObserver' in window)){fn(true);return}
+    new IntersectionObserver(function(es){es.forEach(function(e){fn(e.isIntersecting)})},{threshold:.25}).observe(el)}
+  function runLoop(el,dur,draw){var raf=0,t0=0;
+    function frame(ts){if(!t0)t0=ts;draw(((ts-t0)%dur)/dur);raf=requestAnimationFrame(frame)}
+    onView(el,function(v){if(v&&!raf){t0=0;raf=requestAnimationFrame(frame)}else if(!v&&raf){cancelAnimationFrame(raf);raf=0}})}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+  function lightUp(list){if(!list)return;var items=[].slice.call(list.children);
+    if(RM||!('IntersectionObserver' in window)){return}
+    list.classList.add('anim');var done=false;
+    onView(list,function(v){if(v&&!done){done=true;items.forEach(function(li,i){setTimeout(function(){li.classList.add('lit')},300+i*650)})}})}
+
+  var fig=document.querySelector('.rep-fig');
+  if(fig){
+    var leg=fig.querySelector('#sq-leg'),torso=fig.querySelector('#sq-torso'),head=fig.querySelector('#sq-head'),bar=fig.querySelector('#sq-bar'),
+        repEl=fig.querySelector('#sq-rep'),cue=fig.querySelector('#sq-cue'),rep=1,last=0;
+    function ease(t){return t*t*(3-2*t)}
+    function draw(p){
+      if(p<last){rep=rep%5+1}last=p;
+      var d=p<.4?ease(p/.4):p<.46?1:p<.8?1-ease((p-.46)/.34):0;
+      var phi=(8+32*d)*Math.PI/180,hx=170-85*Math.sin(phi),hy=262-(124-70*d),ax=172,ay=262,L1=62,L2=64;
+      var dx=hx-ax,dy=hy-ay,D=Math.sqrt(dx*dx+dy*dy),a=(L1*L1-L2*L2+D*D)/(2*D),h=Math.sqrt(Math.max(0,L1*L1-a*a)),ux=dx/D,uy=dy/D;
+      var kx=ax+a*ux-h*uy,ky=ay+a*uy+h*ux,sx=hx+85*Math.sin(phi),sy=hy-85*Math.cos(phi);
+      leg.setAttribute('d','M'+ax+' '+ay+'L'+kx.toFixed(1)+' '+ky.toFixed(1)+'L'+hx.toFixed(1)+' '+hy.toFixed(1));
+      torso.setAttribute('d','M'+hx.toFixed(1)+' '+hy.toFixed(1)+'L'+sx.toFixed(1)+' '+sy.toFixed(1));
+      head.setAttribute('cx',(sx+42*Math.sin(phi)).toFixed(1));head.setAttribute('cy',(sy-42*Math.cos(phi)).toFixed(1));
+      bar.setAttribute('transform','translate('+sx.toFixed(1)+' '+(sy+2).toFixed(1)+')');
+      repEl.textContent='Rep '+rep+' of 5';cue.textContent=p<.4?'Down':p<.46?'Pause':p<.8?'Up':'Stand tall';
+    }
+    if(RM){draw(.02)}else{runLoop(fig,5200,draw)}
+  }
+})();
+</script>
+</body>
+</html>

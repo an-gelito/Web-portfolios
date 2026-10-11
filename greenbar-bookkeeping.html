@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Greenbar Bookkeeping</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout: headline left, a greenbar ledger right that reconciles itself once on load; four-step month; plan comparison table; FAQ; call request form. Single look by choice. */
+:root{
+  --sage:#E4EBE0; --sage-2:#D3DECD; --ink:#16241A; --ink-soft:#44564A; --red:#C0392B; --hl:#F3E27A; --paper:#F8FAF5; --line:#B9C8B3; --white:#FFFFFF; --ok:#1E6B3A;
+  --display:'Newsreader', Georgia, 'Times New Roman', serif;
+  --body:'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 1.0625rem/1.6 var(--body)}
+h1,h2,h3{font-family:var(--display);font-weight:500;line-height:1.1;margin:0;text-wrap:balance}
+p{margin:0}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+.wrap{width:min(1120px,100%);margin-inline:auto;padding-inline:max(1rem,4vw)}
+.sample{background:var(--ink);color:var(--sage);font-size:.875rem;padding-block:.55rem}
+.sample .wrap{display:flex;flex-wrap:wrap;gap:.25rem 1.5rem;justify-content:space-between}
+
+.top{display:flex;justify-content:space-between;align-items:center;gap:1rem;padding-block:1.25rem}
+.logo{font-family:var(--display);font-size:1.5rem;font-weight:600;text-decoration:none}
+.top nav{display:flex;gap:1.5rem}
+.top nav a{text-decoration:none;font-weight:500}
+.top nav a:hover{text-decoration:underline;text-underline-offset:.25em}
+
+.hero{background:var(--sage);padding-bottom:clamp(2.5rem,6vw,4.5rem)}
+.hero .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:clamp(1.5rem,5vw,4rem);align-items:center;padding-top:clamp(1rem,3vw,2.5rem)}
+h1{font-size:clamp(2.6rem,6vw,4.6rem);letter-spacing:-.015em}
+.lede{margin-top:1.25rem;font-size:1.2rem;max-width:30rem;color:var(--ink-soft)}
+.btn{display:inline-block;margin-top:1.6rem;background:var(--ink);color:var(--white);padding:.95rem 1.5rem;border-radius:.3rem;font-weight:600;text-decoration:none;border:0;font:600 1rem var(--body);cursor:pointer}
+.btn:hover{background:#0B160F}
+.hero small{display:block;margin-top:.9rem;color:var(--ink-soft);font-size:.9rem}
+
+.ledger-box{background:var(--white);border:1px solid var(--line);border-radius:.35rem;box-shadow:0 1px 0 var(--line)}
+.ledger-cap{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;padding:.8rem 1rem;border-bottom:1px solid var(--line);font-size:.9rem}
+.ledger-cap b{font-weight:600}
+.tally{font-family:var(--mono);font-size:.9rem}
+.scroll{overflow-x:auto}
+table.ledger{border-collapse:collapse;width:100%;min-width:440px;font-size:.95rem}
+.ledger th{font-weight:600;text-align:left;padding:.55rem .75rem;border-bottom:2px solid var(--ink);font-size:.85rem}
+.ledger td{padding:.6rem .75rem;vertical-align:baseline}
+.ledger tbody tr:nth-child(odd){background:#EEF4EA}
+.ledger td:first-child,.ledger th:first-child{border-right:3px double var(--red);width:5.2rem}
+.ledger .amt{font-family:var(--mono);text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ledger th.amt{text-align:right}
+.ledger .date{font-family:var(--mono);font-size:.85rem}
+.ledger td.mark{width:2rem;text-align:center;color:var(--ok);font-weight:700}
+.ledger .mark span{opacity:0;display:inline-block;transform:scale(.6);transition:opacity .2s,transform .2s}
+.ledger tr.matched .mark span{opacity:1;transform:none}
+.ledger tr.matched td{animation:flash 1.1s ease-out}
+@keyframes flash{from{background-color:var(--hl)}}
+.neg{color:var(--red)}
+
+section{padding-block:clamp(3rem,7vw,5.5rem)}
+h2{font-size:clamp(2rem,4vw,3rem);margin-bottom:1.5rem}
+.sub{max-width:36rem;color:var(--ink-soft);margin:-.75rem 0 2rem}
+
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1.5rem;counter-reset:s}
+.steps li{counter-increment:s;border-top:3px solid var(--ink);padding-top:1rem}
+.steps li::before{content:"Week " counter(s);display:block;font-family:var(--mono);font-size:.85rem;color:var(--red);margin-bottom:.5rem}
+.steps h3{font-size:1.4rem;margin-bottom:.5rem}
+.steps p{color:var(--ink-soft);font-size:1rem}
+
+.plans{background:var(--sage)}
+table.plan{border-collapse:collapse;width:100%;min-width:560px;background:var(--white);border:1px solid var(--line)}
+.plan th,.plan td{padding:.85rem 1rem;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.plan thead th{font-family:var(--display);font-size:1.3rem;font-weight:600;border-bottom:2px solid var(--ink)}
+.plan tbody th{font-weight:500;width:34%}
+.plan td.price{font-family:var(--mono)}
+.plan .y{color:var(--ok);font-weight:700}
+.plan .n{color:var(--ink-soft)}
+.note{margin-top:1rem;font-size:.9rem;color:var(--ink-soft)}
+
+.faq{max-width:46rem}
+details{border-top:1px solid var(--line);padding-block:1rem}
+details:last-of-type{border-bottom:1px solid var(--line)}
+summary{cursor:pointer;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:1rem}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-family:var(--mono);font-size:1.2rem;line-height:1}
+details[open] summary::after{content:"–"}
+details p{margin-top:.7rem;color:var(--ink-soft);max-width:40rem}
+
+.call{background:var(--ink);color:var(--sage)}
+.call h2{color:var(--white)}
+.call .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,4rem);align-items:start}
+form{display:grid;gap:1rem}
+label{display:grid;gap:.35rem;font-weight:500;font-size:.95rem}
+input,select{font:inherit;padding:.75rem .85rem;border-radius:.3rem;border:1px solid #6F8576;background:#F8FAF5;color:var(--ink);width:100%}
+input:focus-visible,select:focus-visible{outline:3px solid var(--hl);outline-offset:2px}
+.err{color:#FFB4A8;font-size:.875rem;min-height:1.1em}
+.call .btn{background:var(--hl);color:var(--ink);margin-top:.25rem}
+.call .btn:hover{background:#FFEF9A}
+.done{background:#22372A;border:1px solid #4A6653;border-radius:.35rem;padding:1.4rem}
+.done h3{color:var(--white);font-size:1.5rem;margin-bottom:.5rem}
+.contact{margin-top:1.5rem;font-size:.95rem}
+.contact p+p{margin-top:.25rem}
+
+footer{padding-block:2rem;font-size:.9rem;color:var(--ink-soft);background:var(--paper)}
+footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:.5rem 2rem}
+
+@media (max-width:860px){
+  .hero .grid,.call .grid{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .top nav{display:none}
+}
+@media (max-width:520px){.steps{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){
+  .ledger .mark span{transition:none}
+  .ledger tr.matched td{animation:none}
+}
+
+/* the page you get on the 10th */
+.sheet-sec{background:var(--paper)}
+.sheet-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(1.5rem,5vw,4rem);align-items:center}
+.sheet-grid p{max-width:30rem;color:var(--ink-soft)}
+.sheet{position:relative;overflow:hidden;background:var(--white);border:1px solid var(--line);border-radius:.35rem;padding:1.4rem 1.4rem 4.2rem;box-shadow:6px 6px 0 var(--sage-2)}
+.sheet .sh-head{display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;font-family:var(--display);font-size:1.4rem;border-bottom:2px solid var(--ink);padding-bottom:.6rem}
+.sheet .sh-head span{font-family:var(--body);font-size:.85rem;color:var(--ink-soft);align-self:end}
+.sheet dl{margin:1rem 0 0;display:grid;gap:.5rem}
+.sheet dl div{display:flex;justify-content:space-between;gap:1rem;align-items:baseline;padding-block:.35rem;border-bottom:1px dotted var(--line)}
+.sheet dt{font-weight:500}
+.sheet dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sheet .tot{border-bottom:0;border-top:2px solid var(--ink);padding-top:.6rem;font-weight:600}
+.sheet .tot dd{font-weight:500;font-size:1.2rem}
+.sheet .bars{display:grid;gap:.4rem;margin-top:1rem}
+.sheet .bars i{display:block;height:.7rem;border-radius:.2rem;width:0;transition:width 1.4s cubic-bezier(.2,.7,.2,1)}
+.sheet .bars .bin{background:var(--ok)}
+.sheet .bars .bout{background:var(--red)}
+.sheet.go .bars .bin{width:100%}
+.sheet.go .bars .bout{width:44.3%}
+.sheet .stamp{position:absolute;right:1.1rem;bottom:1.2rem;border:3px solid var(--red);color:var(--red);font:600 1.15rem var(--mono);letter-spacing:.06em;padding:.25rem .7rem;border-radius:.25rem;opacity:0;transform:rotate(-9deg) scale(2.2);pointer-events:none;background:rgba(255,255,255,.6)}
+.sheet.stamped .stamp{opacity:.92;transform:rotate(-9deg) scale(1);transition:transform .28s cubic-bezier(.3,1.6,.5,1),opacity .15s}
+ol.steps.anim li{opacity:.45;border-top-color:var(--line);transition:opacity .5s,border-color .5s}
+ol.steps.anim li.lit{opacity:1;border-top-color:var(--ink)}
+@media (max-width:860px){.sheet-grid{grid-template-columns:minmax(0,1fr)}}
+@media (prefers-reduced-motion:reduce){.sheet .bars i{transition:none}.sheet .stamp{transition:none}}
+
+html{-webkit-text-size-adjust:100%}img,svg{max-width:100%}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="sample"><div class="wrap"><span>Sample project by Angelo Zagada. Greenbar Bookkeeping is a made-up company.</span><span>Prices, figures and forms on this page are for demonstration only.</span></div></div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="top">
+      <a class="logo" href="#">Greenbar Bookkeeping</a>
+      <nav aria-label="Main"><a href="#month">How a month works</a><a href="#plans">Plans</a><a href="#faq">Questions</a><a href="#call">Book a call</a></nav>
+    </div>
+    <div class="grid">
+      <div>
+        <h1>Your books, reconciled by the 10th.</h1>
+        <p class="lede">Monthly bookkeeping for small service businesses. We match every bank line to a receipt or an invoice, and send you one page that says where you stand.</p>
+        <a class="btn" href="#call">Book a free 20-minute call</a>
+        <small>No sign-up. We start by looking at how far behind you are.</small>
+      </div>
+      <div class="ledger-box" aria-label="Sample ledger being reconciled">
+        <div class="ledger-cap"><b>March, checking account</b><span class="tally" id="tally" aria-live="polite">0 of 7 matched</span></div>
+        <div class="scroll" tabindex="0" role="region" aria-label="Sample ledger table, scrolls sideways on small screens">
+          <table class="ledger">
+            <thead><tr><th>Date</th><th>Description</th><th>Category</th><th class="amt">Amount</th><th><span class="sr" style="position:absolute;left:-9999px">Matched</span></th></tr></thead>
+            <tbody id="rows">
+              <tr><td class="date">03/02</td><td>Invoice #1041, Alder Street Flowers</td><td>Sales</td><td class="amt">1,200.00</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/04</td><td>Office rent</td><td>Rent</td><td class="amt neg">−650.00</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/07</td><td>Printer paper and toner</td><td>Supplies</td><td class="amt neg">−86.40</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/11</td><td>Invoice #1042, Corner Bike Shop</td><td>Sales</td><td class="amt">480.00</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/15</td><td>Software subscription</td><td>Software</td><td class="amt neg">−39.00</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/21</td><td>Invoice #1043, Hale Tutoring</td><td>Sales</td><td class="amt">325.00</td><td class="mark"><span>✓</span></td></tr>
+              <tr><td class="date">03/28</td><td>Business insurance</td><td>Insurance</td><td class="amt neg">−112.50</td><td class="mark"><span>✓</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note" style="padding:.7rem 1rem;margin:0;border-top:1px solid var(--line)">Sample ledger, made-up figures.</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <section id="month">
+    <div class="wrap">
+      <h2>What happens each month</h2>
+      <ol class="steps">
+        <li><h3>We pull your records</h3><p>Bank and card feeds come in on the 1st. You send receipts and invoices as photos or PDFs.</p></li>
+        <li><h3>We match and categorize</h3><p>Every line is matched to a document. Anything we can't match goes on a short list for you.</p></li>
+        <li><h3>You answer the short list</h3><p>Usually a handful of questions, like "What was this $212 charge on the 14th?"</p></li>
+        <li><h3>You get your page</h3><p>By the 10th: profit for the month, what customers owe you, and what is due next.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  
+<section class="sheet-sec"><div class="wrap sheet-grid">
+  <div>
+    <h2>The page you get on the 10th</h2>
+    <p>One page in plain numbers: what came in, what went out, and what is left. This one is built from the sample ledger above.</p>
+  </div>
+  <div class="sheet" id="sheet" aria-label="Sample monthly summary page">
+    <div class="sh-head">March summary <span>Sample, made-up figures</span></div>
+    <dl>
+      <div><dt>Money in</dt><dd data-to="2005">$0.00</dd></div>
+      <div><dt>Money out</dt><dd data-to="887.9">$0.00</dd></div>
+      <div class="tot"><dt>Left over</dt><dd data-to="1117.1">$0.00</dd></div>
+    </dl>
+    <div class="bars" aria-hidden="true"><i class="bin"></i><i class="bout"></i></div>
+    <div class="stamp" aria-hidden="true">RECONCILED</div>
+  </div>
+</div></section>
+
+<section class="plans" id="plans">
+    <div class="wrap">
+      <h2>Plans</h2>
+      <p class="sub">Sample pricing for this demo. A real quote depends on how many transactions you have each month.</p>
+      <div class="scroll" tabindex="0" role="region" aria-label="Plans comparison table, scrolls sideways on small screens">
+        <table class="plan">
+          <thead><tr><th scope="col"><span style="position:absolute;left:-9999px">Feature</span></th><th scope="col">Catch-up</th><th scope="col">Monthly</th><th scope="col">Monthly plus</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Price</th><td class="price">$300 one time</td><td class="price">$250 / month</td><td class="price">$400 / month</td></tr>
+            <tr><th scope="row">Clean up past months</th><td class="y">Yes</td><td class="n">Up to 3 months</td><td class="y">Yes</td></tr>
+            <tr><th scope="row">Monthly reconciliation</th><td class="n">No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+            <tr><th scope="row">One-page monthly summary</th><td class="n">No</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+            <tr><th scope="row">Invoice follow-ups</th><td class="n">No</td><td class="n">No</td><td class="y">Yes</td></tr>
+            <tr><th scope="row">Records ready for your tax preparer</th><td class="y">Yes</td><td class="y">Yes</td><td class="y">Yes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">We work inside QuickBooks, so your books stay yours and you can see them any time.</p>
+    </div>
+  </section>
+
+  <section id="faq">
+    <div class="wrap">
+      <h2>Questions people ask first</h2>
+      <div class="faq">
+        <details><summary>I'm several months behind. Is that a problem?</summary><p>No. The Catch-up plan exists for this. We start with the oldest month and work forward, then tell you what is left.</p></details>
+        <details><summary>Do you do taxes?</summary><p>No. We prepare clean records and hand them to your tax preparer, which usually shortens their work.</p></details>
+        <details><summary>What do I need to send you?</summary><p>Read-only access to your bank and card accounts, plus receipts and invoices. We never move money.</p></details>
+        <details><summary>What if you can't match a charge?</summary><p>It goes on the short list in step 3. We don't guess and we don't leave it out.</p></details>
+        <details><summary>Can I stop any time?</summary><p>Yes. The monthly plans have no contract. You keep your books and the files we made.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <section class="call" id="call">
+    <div class="wrap grid">
+      <div>
+        <h2>Book a free 20-minute call</h2>
+        <p>Tell us a little about your business. We will reply with two times that work and a short list of what to have ready.</p>
+        <div class="contact">
+          <p>hello@greenbarbooks.example</p>
+          <p>(555) 010-0163</p>
+          <p>Mon to Fri, 9 am to 5 pm</p>
+        </div>
+      </div>
+      <div id="formbox">
+        <form id="callform" novalidate>
+          <label>Your name<input name="n" autocomplete="name" required><span class="err" data-for="n"></span></label>
+          <label>Email<input name="e" type="email" autocomplete="email" required><span class="err" data-for="e"></span></label>
+          <label>Type of business
+            <select name="t"><option>Service business</option><option>Online shop</option><option>Freelancer</option><option>Other</option></select>
+          </label>
+          <label>How far behind are your books?
+            <select name="b"><option>Up to date</option><option>1 to 3 months</option><option>4 to 12 months</option><option>More than a year</option></select>
+          </label>
+          <button class="btn" type="submit">Request my call</button>
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer><div class="wrap"><span>Greenbar Bookkeeping, made-up company.</span><span>Sample project by Angelo Zagada. No data on this page is real.</span></div></footer>
+
+<script>
+(function(){
+  var rows=[].slice.call(document.querySelectorAll('#rows tr')),tally=document.getElementById('tally'),n=0;
+  var reduce=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function mark(r){r.classList.add("matched");n++;tally.textContent=n+' of '+rows.length+' matched'}
+  if(reduce){rows.forEach(mark)}
+  else{rows.forEach(function(r,i){setTimeout(function(){mark(r)},700+i*420)})}
+
+  var f=document.getElementById('callform'),box=document.getElementById('formbox');
+  function setErr(k,m){f.querySelector('[data-for="'+k+'"]').textContent=m}
+  f.addEventListener('submit',function(ev){
+    ev.preventDefault();
+    var name=f.n.value.trim(),mail=f.e.value.trim(),ok=true;
+    setErr('n','');setErr('e','');
+    if(!name){setErr('n','Enter your name.');ok=false}
+    if(!/^\S+@\S+\.\S+$/.test(mail)){setErr('e','Enter an email like name@example.com.');ok=false}
+    if(!ok){return}
+    box.innerHTML='<div class="done" role="status"><h3></h3><p>This is a sample page, so nothing was sent. On a live site, you would get two call times by email within one business day.</p></div>';
+    box.querySelector('h3').textContent='Call requested, '+name.split(' ')[0]+'.';
+    box.querySelector('.done').setAttribute('tabindex','-1');box.querySelector('.done').focus();
+  });
+})();
+;(function(){
+  var RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function onView(el,fn){if(!('IntersectionObserver' in window)){fn(true);return}
+    new IntersectionObserver(function(es){es.forEach(function(e){fn(e.isIntersecting)})},{threshold:.25}).observe(el)}
+  function runLoop(el,dur,draw){var raf=0,t0=0;
+    function frame(ts){if(!t0)t0=ts;draw(((ts-t0)%dur)/dur);raf=requestAnimationFrame(frame)}
+    onView(el,function(v){if(v&&!raf){t0=0;raf=requestAnimationFrame(frame)}else if(!v&&raf){cancelAnimationFrame(raf);raf=0}})}
+  function clamp(v,a,b){return Math.max(a,Math.min(b,v))}
+  function lightUp(list){if(!list)return;var items=[].slice.call(list.children);
+    if(RM||!('IntersectionObserver' in window)){return}
+    list.classList.add('anim');var done=false;
+    onView(list,function(v){if(v&&!done){done=true;items.forEach(function(li,i){setTimeout(function(){li.classList.add('lit')},300+i*650)})}})}
+
+  lightUp(document.querySelector('ol.steps'));
+  var sh=document.getElementById('sheet');
+  if(sh){
+    var dds=[].slice.call(sh.querySelectorAll('dd')),fmt=function(n){return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})},ran=false;
+    function finish(){dds.forEach(function(d){d.textContent=fmt(parseFloat(d.dataset.to))});sh.classList.add('go','stamped')}
+    if(RM){finish()}
+    else onView(sh,function(v){if(!v||ran)return;ran=true;sh.classList.add('go');var t0=null;
+      (function step(ts){if(!t0)t0=ts;var k=Math.min(1,(ts-t0)/1500),e=1-Math.pow(1-k,3);
+        dds.forEach(function(d){d.textContent=fmt(parseFloat(d.dataset.to)*e)});
+        if(k<1)requestAnimationFrame(step);else setTimeout(function(){sh.classList.add('stamped')},250)})(performance.now())});
+  }
+})();
+</script>
+</body>
+</html>
